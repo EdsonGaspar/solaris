@@ -2,26 +2,205 @@
 
 import {
   Drawer,
-  DrawerClose,
+  // DrawerClose,
   DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
+  // DrawerDescription,
+  // DrawerFooter,
+  // DrawerHeader,
+  // DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
+import mapboxgl from "mapbox-gl";
+import { useEffect, useRef } from "react";
+import { useMyPosition } from "@/hooks/useMyPosition";
+import { useMap } from "@/hooks/useMap";
+import { useDirection } from "@/hooks/useDirection";
+
+const token =
+  "pk.eyJ1Ijoic2t5LTIwMjQiLCJhIjoiY2x3eG5lcmZpMWNpNzJucjFoN2dwYnFiMSJ9.4IEOvqX3dGRZpyHPx-MD9g";
+mapboxgl.accessToken = token;
 
 export default function Home() {
-  const [coords, setCoords] = useState<{ lng: number; lat: number }>({
-    lat: 0,
-    lng: 0,
-  });
+  const { coords, setCoords, myMarker } = useMyPosition();
+  const mapContainer = useRef(null);
+  const { map } = useMap("map");
+  const { setTracking } = useDirection(token, map);
+
+  // useEffect(() => {
+  //   if (map) {
+  //     myMarker.current?.remove();
+  //     myMarker.current = new mapboxgl.Marker({})
+  //       .setLngLat([coords.lng, coords.lat])
+  //       .addTo(map!);
+  //     map.on("style.load", () => {
+  //       map.addLayer({
+  //         id: "route",
+  //         type: "line",
+  //         source: {
+  //           type: "geojson",
+  //           data: {
+  //             type: "Feature",
+  //             properties: {},
+  //             geometry: {
+  //               type: "LineString",
+  //               coordinates: [
+  //   [
+  //     13.254653,
+  //     -8.873806
+  //   ],
+  //   [
+  //     13.254883,
+  //     -8.874103
+  //   ],
+  //   [
+  //     13.255078,
+  //     -8.874011
+  //   ],
+  //   [
+  //     13.255358,
+  //     -8.880502
+  //   ],
+  //   [
+  //     13.250982,
+  //     -8.883253
+  //   ],
+  //   [
+  //     13.25134,
+  //     -8.883577
+  //   ],
+  //   [
+  //     13.255401,
+  //     -8.880858
+  //   ],
+  //   [
+  //     13.26706,
+  //     -8.875321
+  //   ],
+  //   [
+  //     13.270681,
+  //     -8.87544
+  //   ],
+  //   [
+  //     13.279929,
+  //     -8.878078
+  //   ],
+  //   [
+  //     13.287619,
+  //     -8.880797
+  //   ],
+  //   [
+  //     13.28952,
+  //     -8.880869
+  //   ],
+  //   [
+  //     13.299876,
+  //     -8.887382
+  //   ],
+  //   [
+  //     13.299773,
+  //     -8.887566
+  //   ],
+  //   [
+  //     13.325042,
+  //     -8.9032
+  //   ],
+  //   [
+  //     13.320792,
+  //     -8.909828
+  //   ],
+  //   [
+  //     13.320318,
+  //     -8.909506
+  //   ],
+  //   [
+  //     13.322832,
+  //     -8.911388
+  //   ],
+  //   [
+  //     13.373022,
+  //     -8.944193
+  //   ],
+  //   [
+  //     13.373185,
+  //     -8.944366
+  //   ]
+  // ],
+  //             },
+  //           },
+  //         },
+  //         layout: {
+  //           "line-join": "round",
+  //           "line-cap": "round",
+  //         },
+  //         paint: {
+  //           "line-color": "#00f",
+  //           "line-width": 4,
+  //         },
+  //       });
+  //     });
+  //   }
+
+  //   async function getDirection() {
+  //     const start = [13.2439512, -8.8272699],
+  //       end = [13.373148, -8.9444];
+
+  //     const res = await fetch(
+  //       `https://api.mapbox.com/directions/v5/mapbox/driving/${start[0]},${start[1]};${end[0]},${end[1]}.json?geometries=geojson&steps=true&access_token=${token}`
+  //     );
+
+  //     // "https://api.mapbox.com/directions/v5/mapbox/driving/13.2439512,-8.8272699;13.373148,-8.90444.json?geometries=polyline&steps=true&overview=full&language=en&access_token=pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2p0MG01MXRqMW45cjQzb2R6b2ptc3J4MSJ9.zA2W0IkI0c6KaAhJfk9bWg";
+  //     // https://api.mapbox.com/directions/v5/mapbox/driving/13.2439512%2C-8.8272699%3B13.373148%2C-8.90444.json?geometries=polyline&steps=true&overview=full&language=en&access_token=pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2p0MG01MXRqMW45cjQzb2R6b2ptc3J4MSJ9.zA2W0IkI0c6KaAhJfk9bWg
+
+  //     if (res.ok) {
+  //       const directions = await res.json();
+  //       // console.log(directions);
+  //       const data = directions.routes[0];
+  //       const route = data.geometry;
+
+  //       map?.on("load", function () {
+  //         map.addLayer({
+  //           id: "route",
+  //           type: "line",
+  //           source: {
+  //             type: "geojson",
+  //             data: {
+  //               type: "Feature",
+  //               properties: {},
+  //               geometry: {
+  //                 type: "LineString",
+  //                 coordinates: route,
+  //               },
+  //             },
+  //           },
+  //           layout: {
+  //             "line-join": "round",
+  //             "line-cap": "round",
+  //           },
+  //           paint: {
+  //             "line-color": "#3887be",
+  //             "line-width": 5,
+  //             "line-opacity": 0.75,
+  //           },
+  //         });
+  //         // map.fitBounds(route, { padding: 20 });
+  //       });
+
+  //       // if (map?.getSource("route")) {
+  //       //   map.getSource("route").setData(geojson);
+  //       // }
+  //     }
+  //   }
+  //   // getDirection();
+  // }, [map, coords]);
 
   return (
     <main className="h-screen w-screen sm:w-80 sm:mx-auto sm:shadow-md relative overflow-hidden bg-[url('/images/map.png')] bg-cover bg-center">
-      {/* <Image src={"/images/map.png"} alt={"map"} width={600} height={600}  className="absolute aspect-square"  /> */}
+      <div
+        ref={mapContainer}
+        id="map"
+        className="map-container w-full max-w-80 h-full"
+      />
       {/* top location */}
       <div className="absolute top-0 left-0 w-full p-4">
         <div className="w-full bg-white/80 backdrop-blur-sm rounded flex flex-col gap-1 p-3 shadow-md">
@@ -38,9 +217,17 @@ export default function Home() {
                         lng: evt.coords.longitude,
                         lat: evt.coords.latitude,
                       }));
+
+                      setTracking((prev) => {
+                        return {
+                          ...prev,
+                          start: [evt.coords.longitude, evt.coords.latitude],
+                          end: [13.373148, -8.9444],
+                        };
+                      });
                     },
                     (err) => {
-                      console.error("Não possível obter sua localização");
+                      alert("Não possível obter sua localização");
                     }
                   );
                 }}
@@ -92,7 +279,7 @@ export default function Home() {
       </div>
 
       {/* bottom */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 rounded-t-md bg-white/80 backdrop-blur">
+      <div className="absolute bottom-0 left-0 right-0 p-4 rounded-t-md bg-white/80 backdrop-blur z-10">
         <Drawer>
           <DrawerTrigger asChild>
             <button className="block w-full px-4 py-3 bg-blue-600 rounded text-slate-50">
