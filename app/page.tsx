@@ -17,6 +17,8 @@ import { useMyPosition } from "@/hooks/useMyPosition";
 import { useMap } from "@/hooks/useMap";
 import { useDirection } from "@/hooks/useDirection";
 import { useSetRefreshPoitMarker } from "@/hooks/useSetRefreshPointMarker";
+import { useGetRefreshPoint } from "@/hooks/useGetRefreshPoint";
+import { cn } from "@/lib/utils";
 
 const token =
   "pk.eyJ1Ijoic2t5LTIwMjQiLCJhIjoiY2x3eG5lcmZpMWNpNzJucjFoN2dwYnFiMSJ9.4IEOvqX3dGRZpyHPx-MD9g";
@@ -28,17 +30,18 @@ export default function Home() {
   const { map } = useMap("map");
   const { setTracking } = useDirection(token, map);
   useSetRefreshPoitMarker(map);
+  const { pontos, setPointSelected } = useGetRefreshPoint();
 
-  useEffect(() => {
-    if (map) {
-      map.on("click", (evt) => {
-        console.log({
-          lat: evt.lngLat.lat,
-          lng: evt.lngLat.lng,
-        });
-      });
-    }
-  }, [map]);
+  // useEffect(() => {
+  //   if (map) {
+  //     map.on("click", (evt) => {
+  //       console.log({
+  //         lat: evt.lngLat.lat,
+  //         lng: evt.lngLat.lng,
+  //       });
+  //     });
+  //   }
+  // }, [map]);
 
   // useEffect(() => {
   //   if (map) {
@@ -313,50 +316,69 @@ export default function Home() {
               </TabsList>
               <TabsContent value="refresh">
                 <ul className="max-h-40 overflow-auto">
-                  <li className="flex flex-row items-start gap-2 py-3 px-2 border-b last:border-b-0 bg-slate-100 rounded  ">
-                    <svg
-                      className="w-5 h-5 fill-slate-600"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
+                  {pontos.map((ponto) => (
+                    <li
+                      key={ponto.id}
+                      className="flex flex-row items-start gap-2 py-3 px-2 border-b last:border-b-0 bg-slate-100 rounded  "
                     >
-                      <path d="M12 3.09723L7.05025 8.04697C4.31658 10.7806 4.31658 15.2128 7.05025 17.9465C9.78392 20.6801 14.2161 20.6801 16.9497 17.9465C19.6834 15.2128 19.6834 10.7806 16.9497 8.04697L12 3.09723ZM12 0.268799L18.364 6.63276C21.8787 10.1475 21.8787 15.846 18.364 19.3607C14.8492 22.8754 9.15076 22.8754 5.63604 19.3607C2.12132 15.846 2.12132 10.1475 5.63604 6.63276L12 0.268799Z" />
-                    </svg>
-                    <div className="w-full flex flex-col gap-2">
-                      <p className="text-sm font-bold">Rangel</p>
-                      <div className="flex flex-row gap-2">
-                        <span className="flex flex-row items-center">
-                          <svg
-                            className="w-4 h-4 fill-slate-600"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                          >
-                            <path d="M12 11C14.7614 11 17 13.2386 17 16V22H15V16C15 14.4023 13.7511 13.0963 12.1763 13.0051L12 13C10.4023 13 9.09634 14.2489 9.00509 15.8237L9 16V22H7V16C7 13.2386 9.23858 11 12 11ZM5.5 14C5.77885 14 6.05009 14.0326 6.3101 14.0942C6.14202 14.594 6.03873 15.122 6.00896 15.6693L6 16L6.0007 16.0856C5.88757 16.0456 5.76821 16.0187 5.64446 16.0069L5.5 16C4.7203 16 4.07955 16.5949 4.00687 17.3555L4 17.5V22H2V17.5C2 15.567 3.567 14 5.5 14ZM18.5 14C20.433 14 22 15.567 22 17.5V22H20V17.5C20 16.7203 19.4051 16.0796 18.6445 16.0069L18.5 16C18.3248 16 18.1566 16.03 18.0003 16.0852L18 16C18 15.3343 17.8916 14.694 17.6915 14.0956C17.9499 14.0326 18.2211 14 18.5 14ZM5.5 8C6.88071 8 8 9.11929 8 10.5C8 11.8807 6.88071 13 5.5 13C4.11929 13 3 11.8807 3 10.5C3 9.11929 4.11929 8 5.5 8ZM18.5 8C19.8807 8 21 9.11929 21 10.5C21 11.8807 19.8807 13 18.5 13C17.1193 13 16 11.8807 16 10.5C16 9.11929 17.1193 8 18.5 8ZM5.5 10C5.22386 10 5 10.2239 5 10.5C5 10.7761 5.22386 11 5.5 11C5.77614 11 6 10.7761 6 10.5C6 10.2239 5.77614 10 5.5 10ZM18.5 10C18.2239 10 18 10.2239 18 10.5C18 10.7761 18.2239 11 18.5 11C18.7761 11 19 10.7761 19 10.5C19 10.2239 18.7761 10 18.5 10ZM12 2C14.2091 2 16 3.79086 16 6C16 8.20914 14.2091 10 12 10C9.79086 10 8 8.20914 8 6C8 3.79086 9.79086 2 12 2ZM12 4C10.8954 4 10 4.89543 10 6C10 7.10457 10.8954 8 12 8C13.1046 8 14 7.10457 14 6C14 4.89543 13.1046 4 12 4Z" />
-                          </svg>
-                          <span className="ml-2 text-sm font-bold">4</span>
-                        </span>
-                        <span className="border-r"></span>
-                        <span className="flex flex-row items-center">
-                          <svg
-                            className="w-4 h-4 fill-slate-600"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                          >
-                            <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 7H13V9H11V7ZM11 11H13V17H11V11Z" />
-                          </svg>
-
-                          <span className="ml-2 text-sm text-green-600 font-bold">
-                            Funcionando
+                      <svg
+                        className="w-5 h-5 fill-slate-600"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M12 3.09723L7.05025 8.04697C4.31658 10.7806 4.31658 15.2128 7.05025 17.9465C9.78392 20.6801 14.2161 20.6801 16.9497 17.9465C19.6834 15.2128 19.6834 10.7806 16.9497 8.04697L12 3.09723ZM12 0.268799L18.364 6.63276C21.8787 10.1475 21.8787 15.846 18.364 19.3607C14.8492 22.8754 9.15076 22.8754 5.63604 19.3607C2.12132 15.846 2.12132 10.1475 5.63604 6.63276L12 0.268799Z" />
+                      </svg>
+                      <div className="w-full flex flex-col gap-2">
+                        <p className="text-sm font-bold">{ponto.nome}</p>
+                        <div className="flex flex-row gap-2">
+                          <span className="flex flex-row items-center">
+                            <svg
+                              className="w-4 h-4 fill-slate-600"
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                            >
+                              <path d="M12 11C14.7614 11 17 13.2386 17 16V22H15V16C15 14.4023 13.7511 13.0963 12.1763 13.0051L12 13C10.4023 13 9.09634 14.2489 9.00509 15.8237L9 16V22H7V16C7 13.2386 9.23858 11 12 11ZM5.5 14C5.77885 14 6.05009 14.0326 6.3101 14.0942C6.14202 14.594 6.03873 15.122 6.00896 15.6693L6 16L6.0007 16.0856C5.88757 16.0456 5.76821 16.0187 5.64446 16.0069L5.5 16C4.7203 16 4.07955 16.5949 4.00687 17.3555L4 17.5V22H2V17.5C2 15.567 3.567 14 5.5 14ZM18.5 14C20.433 14 22 15.567 22 17.5V22H20V17.5C20 16.7203 19.4051 16.0796 18.6445 16.0069L18.5 16C18.3248 16 18.1566 16.03 18.0003 16.0852L18 16C18 15.3343 17.8916 14.694 17.6915 14.0956C17.9499 14.0326 18.2211 14 18.5 14ZM5.5 8C6.88071 8 8 9.11929 8 10.5C8 11.8807 6.88071 13 5.5 13C4.11929 13 3 11.8807 3 10.5C3 9.11929 4.11929 8 5.5 8ZM18.5 8C19.8807 8 21 9.11929 21 10.5C21 11.8807 19.8807 13 18.5 13C17.1193 13 16 11.8807 16 10.5C16 9.11929 17.1193 8 18.5 8ZM5.5 10C5.22386 10 5 10.2239 5 10.5C5 10.7761 5.22386 11 5.5 11C5.77614 11 6 10.7761 6 10.5C6 10.2239 5.77614 10 5.5 10ZM18.5 10C18.2239 10 18 10.2239 18 10.5C18 10.7761 18.2239 11 18.5 11C18.7761 11 19 10.7761 19 10.5C19 10.2239 18.7761 10 18.5 10ZM12 2C14.2091 2 16 3.79086 16 6C16 8.20914 14.2091 10 12 10C9.79086 10 8 8.20914 8 6C8 3.79086 9.79086 2 12 2ZM12 4C10.8954 4 10 4.89543 10 6C10 7.10457 10.8954 8 12 8C13.1046 8 14 7.10457 14 6C14 4.89543 13.1046 4 12 4Z" />
+                            </svg>
+                            <span className="ml-2 text-sm font-bold">
+                              {ponto.numero_actual_pessoas}
+                            </span>
                           </span>
-                        </span>
+                          <span className="border-r"></span>
+                          <span className="flex flex-row items-center">
+                            <svg
+                              className="w-4 h-4 fill-slate-600"
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                            >
+                              <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 7H13V9H11V7ZM11 11H13V17H11V11Z" />
+                            </svg>
+
+                            <span
+                              className={cn(
+                                "ml-2 text-sm text-green-600 font-bold",
+                                ponto.estado === "CHEIO" && "text-orange-600",
+                                ponto.estado === "INDISPONÍVEL" &&
+                                  "text-red-600"
+                              )}
+                            >
+                              {ponto.estado}
+                            </span>
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <button className="text-xs bg-blue-600 p-2 text-slate-50 rounded self-center">
-                      Selecionar
-                    </button>
-                  </li>
+                      <button
+                        disabled={ponto.estado !== "FUNCIONAL"}
+                        className={cn(
+                          "text-xs bg-blue-600 p-2 text-slate-50 rounded self-center disabled:cursor-not-allowed disabled:bg-slate-400"
+                        )}
+                      >
+                        Selecionar
+                      </button>
+                    </li>
+                  ))}
                 </ul>
               </TabsContent>
               {/* rastremento de ponto */}

@@ -3,7 +3,7 @@
         "id": 1,
         "nome": "Rangel",
         "numero_total_pessoas": 10,
-        "estado": "FUNCIONAL",
+        "estado": "INDISPONÍVEL ",
         "numero_actual_pessoas": 4,
         "coords": {
             "lat": -8.81924,
@@ -47,7 +47,7 @@
         "id": 5,
         "nome": "Bairro Kikolo",
         "numero_total_pessoas": 30,
-        "estado": "FUNCIONAL",
+        "estado": "CHEIO",
         "numero_actual_pessoas": 4,
         "coords": {
             "lat": -8.791025170833947,
