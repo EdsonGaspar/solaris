@@ -1,0 +1,12 @@
+[
+    {
+        "nome": "Rangel",
+        "numero_total_pessoas": 10,
+        "estado": "FUNCIONAL",
+        "numero_actual_pessoas": 4,
+        "coords": {
+            "lat": -8.81924,
+            "lng": 13.26683
+        }
+    }
+]
