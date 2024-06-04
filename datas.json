@@ -9,5 +9,49 @@
             "lat": -8.81924,
             "lng": 13.26683
         }
+    },
+    {
+        "id": 2,
+        "nome": "Jumbo",
+        "numero_total_pessoas": 16,
+        "estado": "FUNCIONAL",
+        "numero_actual_pessoas": 4,
+        "coords": {
+            "lat": -8.834126966161136,
+            "lng": 13.251592090480244
+        }
+    },
+    {
+        "id": 3,
+        "nome": "Palanca",
+        "numero_total_pessoas": 20,
+        "estado": "FUNCIONAL",
+        "numero_actual_pessoas": 4,
+        "coords": {
+            "lat": -8.860008632176246,
+            "lng": 13.266564089536331
+        }
+    },
+    {
+        "id": 4,
+        "nome": "Hoji-ya-henda",
+        "numero_total_pessoas": 30,
+        "estado": "FUNCIONAL",
+        "numero_actual_pessoas": 4,
+        "coords": {
+            "lat": -8.807270205521476,
+            "lng": 13.290334758443578
+        }
+    },
+    {
+        "id": 5,
+        "nome": "Bairro Kikolo",
+        "numero_total_pessoas": 30,
+        "estado": "FUNCIONAL",
+        "numero_actual_pessoas": 4,
+        "coords": {
+            "lat": -8.791025170833947,
+            "lng": 13.330115750918964
+        }
     }
 ]

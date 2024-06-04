@@ -16,6 +16,7 @@ import { useEffect, useRef } from "react";
 import { useMyPosition } from "@/hooks/useMyPosition";
 import { useMap } from "@/hooks/useMap";
 import { useDirection } from "@/hooks/useDirection";
+import { useSetRefreshPoitMarker } from "@/hooks/useSetRefreshPointMarker";
 
 const token =
   "pk.eyJ1Ijoic2t5LTIwMjQiLCJhIjoiY2x3eG5lcmZpMWNpNzJucjFoN2dwYnFiMSJ9.4IEOvqX3dGRZpyHPx-MD9g";
@@ -26,6 +27,18 @@ export default function Home() {
   const mapContainer = useRef(null);
   const { map } = useMap("map");
   const { setTracking } = useDirection(token, map);
+  useSetRefreshPoitMarker(map);
+
+  useEffect(() => {
+    if (map) {
+      map.on("click", (evt) => {
+        console.log({
+          lat: evt.lngLat.lat,
+          lng: evt.lngLat.lng,
+        });
+      });
+    }
+  }, [map]);
 
   // useEffect(() => {
   //   if (map) {
