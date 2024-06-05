@@ -28,7 +28,7 @@ export async function getRoute(
   };
   // if the route already exists on the map, we'll reset it using setData
   if (map?.getSource("route")) {
-    map.getSource("route").setData(geojson);
+    (map.getSource("route") as any).setData(geojson);
   }
   // otherwise, we'll make a new request
   else {
@@ -37,7 +37,7 @@ export async function getRoute(
       type: "line",
       source: {
         type: "geojson",
-        data: geojson,
+        data: geojson as any,
       },
       layout: {
         "line-join": "round",

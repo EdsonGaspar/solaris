@@ -406,7 +406,7 @@ export default function Home() {
                               ],
                             };
                             if (map.getLayer("end")) {
-                              map.getSource("end").setData(data);
+                              (map.getSource("end") as any).setData(data);
                             } else {
                               map.addLayer({
                                 id: "end",

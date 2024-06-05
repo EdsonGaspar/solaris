@@ -17,8 +17,9 @@ export function useMyPosition(
       showUserHeading: true,
     });
 
-    myPos.on("geolocate", (evt) => {
-      setMyCoord(evt.coords.longitude, evt.coords.latitude);
+    myPos.on("geolocate", (event) => {
+      const evt = event as any;
+      setMyCoord(evt!.coords.longitude, evt.coords.latitude);
     });
 
     map?.addControl(myPos);
