@@ -1,6 +1,58 @@
 import mapboxgl from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
 
+export async function getRoute(
+  map: mapboxgl.Map | null,
+  start: [number, number],
+  end: [number, number]
+) {
+  // make a directions request using cycling profile
+  // an arbitrary start will always be the same
+  // only the end or destination will change
+  const query = await fetch(
+    `https://api.mapbox.com/directions/v5/mapbox/driving/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${mapboxgl.accessToken}`,
+    { method: "GET" }
+  );
+
+  const json = await query.json();
+
+  const data = json.routes[0];
+  const route = data.geometry.coordinates;
+  const geojson = {
+    type: "Feature",
+    properties: {},
+    geometry: {
+      type: "LineString",
+      coordinates: route,
+    },
+  };
+  // if the route already exists on the map, we'll reset it using setData
+  if (map?.getSource("route")) {
+    map.getSource("route").setData(geojson);
+  }
+  // otherwise, we'll make a new request
+  else {
+    map?.addLayer({
+      id: "route",
+      type: "line",
+      source: {
+        type: "geojson",
+        data: geojson,
+      },
+      layout: {
+        "line-join": "round",
+        "line-cap": "round",
+      },
+      paint: {
+        "line-color": "#3887be",
+        "line-width": 5,
+        "line-opacity": 0.75,
+      },
+    });
+  }
+  // add turn instructions here at the end
+}
+
 export function useDirection(
   token: string,
   map: mapboxgl.Map | null
@@ -8,70 +60,49 @@ export function useDirection(
   //   end?: [number, number]
 ) {
   const [tracking, setTracking] = useState<{
-    start: [number, number];
-    end: [number, number];
-  }>();
+    start?: [number, number];
+    end?: [number, number];
+  }>({});
   const markers = useRef<{ from?: mapboxgl.Marker; to?: mapboxgl.Marker }>({});
 
   useEffect(() => {
-    if (!map || !tracking) return;
-
     const { start, end } = tracking;
 
-    markers.current.from?.remove();
-    markers.current.to?.remove();
-    markers.current.from = new mapboxgl.Marker({}).setLngLat(start).addTo(map!);
-    markers.current.to = new mapboxgl.Marker({}).setLngLat(end).addTo(map!);
+    if (!map || !start) return;
 
-    async function getDirection() {
-      // const start = [13.2439512, -8.8272699],
-      //   end = [13.373148, -8.9444];
+    map.on("load", () => {
+      // make an initial directions request that
+      // starts and ends at the same location
+      getRoute(map, start, start);
 
-      const res = await fetch(
-        `https://api.mapbox.com/directions/v5/mapbox/driving/${start![0]},${
-          start![1]
-        };${end![0]},${
-          end![1]
-        }.json?geometries=geojson&steps=true&access_token=${token}`
-      );
-
-      if (res.ok) {
-        const directions = await res.json();
-        console.log(directions);
-        const data = directions.routes[0];
-        const route = data.geometry;
-
-        map?.on("load", function () {
-          map.addLayer({
-            id: "route",
-            type: "line",
-            source: {
-              type: "geojson",
-              data: {
+      // Add starting point to the map
+      map.addLayer({
+        id: "point",
+        type: "circle",
+        source: {
+          type: "geojson",
+          data: {
+            type: "FeatureCollection",
+            features: [
+              {
                 type: "Feature",
                 properties: {},
                 geometry: {
-                  type: "LineString",
-                  coordinates: route,
+                  type: "Point",
+                  coordinates: start,
                 },
               },
-            },
-            layout: {
-              "line-join": "round",
-              "line-cap": "round",
-            },
-            paint: {
-              "line-color": "#3887be",
-              "line-width": 5,
-              "line-opacity": 0.75,
-            },
-          });
-        });
-      }
-    }
-
-    // getDirection();
+            ],
+          },
+        },
+        paint: {
+          "circle-radius": 10,
+          "circle-color": "#3887be",
+        },
+      });
+      // this is where the code from the next step will go
+    });
   }, [map, tracking]);
 
-  return { setTracking };
+  return { setTracking, tracking };
 }

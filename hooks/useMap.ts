@@ -7,14 +7,15 @@ export function useMap(mapContainerID: string) {
 
   useEffect(() => {
     if (map) return; // initialize map only once
-    setMap(
-      new mapboxgl.Map({
-        container: mapContainerID,
-        style: "mapbox://styles/mapbox/streets-v12",
-        center: [13.2439512, -8.8272699],
-        zoom: 11,
-      })
-    );
+    const nav = new mapboxgl.NavigationControl({ visualizePitch: true });
+    const mapBox = new mapboxgl.Map({
+      container: mapContainerID,
+      style: "mapbox://styles/mapbox/streets-v12",
+      center: [13.2439512, -8.8272699],
+      zoom: 11,
+    });
+    mapBox.addControl(nav);
+    setMap(mapBox);
   }, []);
 
   return { map };

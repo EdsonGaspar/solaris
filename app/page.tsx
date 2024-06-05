@@ -12,10 +12,10 @@ import {
 } from "@/components/ui/drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import mapboxgl from "mapbox-gl";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMyPosition } from "@/hooks/useMyPosition";
 import { useMap } from "@/hooks/useMap";
-import { useDirection } from "@/hooks/useDirection";
+import { getRoute, useDirection } from "@/hooks/useDirection";
 import { useSetRefreshPoitMarker } from "@/hooks/useSetRefreshPointMarker";
 import { useGetRefreshPoint } from "@/hooks/useGetRefreshPoint";
 import { cn } from "@/lib/utils";
@@ -25,11 +25,17 @@ const token =
 mapboxgl.accessToken = token;
 
 export default function Home() {
-  const { coords, setCoords, myMarker } = useMyPosition();
   const mapContainer = useRef(null);
   const { map } = useMap("map");
-  const { setTracking } = useDirection(token, map);
+  const { setTracking, tracking } = useDirection(token, map);
   useSetRefreshPoitMarker(map);
+
+  useMyPosition(map, (lng, lat) => {
+    setTracking((prev) => ({ ...prev, start: [lng, lat] }));
+  });
+
+  const [refreshCoords, setRefreshCoords] = useState([0, 0]);
+
   const { pontos, setPointSelected } = useGetRefreshPoint();
 
   // useEffect(() => {
@@ -225,28 +231,28 @@ export default function Home() {
               Localização actual
             </p> */}
             <div className="flex flex-row items-center gap-2 p-2">
-              <button
-                onClick={() => {
-                  window.navigator.geolocation.getCurrentPosition(
-                    (evt) => {
-                      setCoords(() => ({
-                        lng: evt.coords.longitude,
-                        lat: evt.coords.latitude,
-                      }));
+              <span
+              // onClick={() => {
+              //   window.navigator.geolocation.getCurrentPosition(
+              //     (evt) => {
+              //       setCoords(() => ({
+              //         lng: evt.coords.longitude,
+              //         lat: evt.coords.latitude,
+              //       }));
 
-                      setTracking((prev) => {
-                        return {
-                          ...prev,
-                          start: [evt.coords.longitude, evt.coords.latitude],
-                          end: [13.373148, -8.9444],
-                        };
-                      });
-                    },
-                    (err) => {
-                      alert("Não possível obter sua localização");
-                    }
-                  );
-                }}
+              //       setTracking((prev) => {
+              //         return {
+              //           ...prev,
+              //           start: [evt.coords.longitude, evt.coords.latitude],
+              //           end: [13.373148, -8.9444],
+              //         };
+              //       });
+              //     },
+              //     (err) => {
+              //       alert("Não possível obter sua localização");
+              //     }
+              //   );
+              // }}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -256,14 +262,16 @@ export default function Home() {
                 >
                   <path d="M12 20.8995L16.9497 15.9497C19.6834 13.2161 19.6834 8.78392 16.9497 6.05025C14.2161 3.31658 9.78392 3.31658 7.05025 6.05025C4.31658 8.78392 4.31658 13.2161 7.05025 15.9497L12 20.8995ZM12 23.7279L5.63604 17.364C2.12132 13.8492 2.12132 8.15076 5.63604 4.63604C9.15076 1.12132 14.8492 1.12132 18.364 4.63604C21.8787 8.15076 21.8787 13.8492 18.364 17.364L12 23.7279ZM12 13C13.1046 13 14 12.1046 14 11C14 9.89543 13.1046 9 12 9C10.8954 9 10 9.89543 10 11C10 12.1046 10.8954 13 12 13ZM12 15C9.79086 15 8 13.2091 8 11C8 8.79086 9.79086 7 12 7C14.2091 7 16 8.79086 16 11C16 13.2091 14.2091 15 12 15Z" />
                 </svg>
-              </button>
+              </span>
               <input
                 type="text"
                 name="my-location"
                 id="my-location"
                 className="w-full bg-transparent border-b p-2 pb-0 pl-0 outline-none"
                 placeholder="Localização actual"
-                value={`${coords?.lat},${coords?.lng}`}
+                value={`${tracking.start ? tracking.start[0] : ""},${
+                  tracking.start ? tracking.start[1] : ""
+                }`}
                 disabled
               />
             </div>
@@ -286,8 +294,10 @@ export default function Home() {
                 type="text"
                 name="refresh-location"
                 id="refresh-location"
+                disabled
                 className="w-full bg-transparent border-b p-2 pb-0 pl-0 outline-none"
                 placeholder="Localização refrescamento"
+                value={refreshCoords.join(",")}
               />
             </div>
           </div>
@@ -371,6 +381,75 @@ export default function Home() {
                       </div>
                       <button
                         disabled={ponto.estado !== "FUNCIONAL"}
+                        onClick={() => {
+                          const { start } = tracking;
+
+                          if (map && start) {
+                            setRefreshCoords([
+                              ponto.coords.lng,
+                              ponto.coords.lat,
+                            ]);
+                            const data = {
+                              type: "FeatureCollection",
+                              features: [
+                                {
+                                  type: "Feature",
+                                  properties: {},
+                                  geometry: {
+                                    type: "Point",
+                                    coordinates: [
+                                      ponto.coords.lng,
+                                      ponto.coords.lat,
+                                    ],
+                                  },
+                                },
+                              ],
+                            };
+                            if (map.getLayer("end")) {
+                              map.getSource("end").setData(data);
+                            } else {
+                              map.addLayer({
+                                id: "end",
+                                type: "circle",
+                                source: {
+                                  type: "geojson",
+                                  data: {
+                                    type: "FeatureCollection",
+                                    features: [
+                                      {
+                                        type: "Feature",
+                                        properties: {},
+                                        geometry: {
+                                          type: "Point",
+                                          coordinates: [
+                                            ponto.coords.lng,
+                                            ponto.coords.lat,
+                                          ],
+                                        },
+                                      },
+                                    ],
+                                  },
+                                },
+                                paint: {
+                                  "circle-radius": 10,
+                                  "circle-color": "#f30",
+                                },
+                              });
+                            }
+                            getRoute(map, start, [
+                              ponto.coords.lng,
+                              ponto.coords.lat,
+                            ]);
+                          }
+                          //   && map.on("click", (event) => {
+                          //   console.log("olad");
+
+                          //   // const coords = Object.keys(event.lngLat).map(
+                          //   //   (key) => event.lngLat[key]
+                          //   // );
+
+                          // });
+                        }}
                         className={cn(
                           "text-xs bg-blue-600 p-2 text-slate-50 rounded self-center disabled:cursor-not-allowed disabled:bg-slate-400"
                         )}

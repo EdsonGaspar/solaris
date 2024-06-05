@@ -1,11 +1,26 @@
-import { useRef, useState } from "react";
+import mapboxgl from "mapbox-gl";
+import { useEffect } from "react";
 
-export function useMyPosition() {
-  const [coords, setCoords] = useState<{ lng: number; lat: number }>({
-    lat: 0,
-    lng: 0,
-  });
-  const myMarker = useRef<mapboxgl.Marker>();
+export function useMyPosition(
+  map: mapboxgl.Map | null,
+  setMyCoord: (lng: number, lat: number) => void
+) {
+  useEffect(() => {
+    if (!map) return;
 
-  return { coords, setCoords, myMarker };
+    // minha localização
+    const myPos = new mapboxgl.GeolocateControl({
+      positionOptions: {
+        enableHighAccuracy: true,
+      },
+      trackUserLocation: true,
+      showUserHeading: true,
+    });
+
+    myPos.on("geolocate", (evt) => {
+      setMyCoord(evt.coords.longitude, evt.coords.latitude);
+    });
+
+    map?.addControl(myPos);
+  }, [map]);
 }
