@@ -221,7 +221,7 @@ export default function Home() {
       <div
         ref={mapContainer}
         id="map"
-        className="map-container w-full max-w-80 h-full"
+        className="map-container w-full sm:max-w-80 h-full"
       />
       {/* top location */}
       <div className="absolute top-0 left-0 w-full p-4">
