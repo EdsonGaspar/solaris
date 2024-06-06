@@ -4,7 +4,7 @@
     "nome": "Rangel",
     "numero_total_pessoas": 10,
     "estado": "INDISPONÍVEL",
-    "numero_actual_pessoas": 4,
+    "numero_actual_pessoas": 0,
     "coords": {
       "lat": -8.81924,
       "lng": 13.26683
@@ -15,7 +15,7 @@
     "nome": "Jumbo",
     "numero_total_pessoas": 16,
     "estado": "FUNCIONAL",
-    "numero_actual_pessoas": 4,
+    "numero_actual_pessoas": 3,
     "coords": {
       "lat": -8.834126966161136,
       "lng": 13.251592090480244
@@ -26,7 +26,7 @@
     "nome": "Palanca",
     "numero_total_pessoas": 20,
     "estado": "FUNCIONAL",
-    "numero_actual_pessoas": 4,
+    "numero_actual_pessoas": 6,
     "coords": {
       "lat": -8.860008632176246,
       "lng": 13.266564089536331
@@ -48,7 +48,7 @@
     "nome": "Bairro Kikolo",
     "numero_total_pessoas": 30,
     "estado": "CHEIO",
-    "numero_actual_pessoas": 4,
+    "numero_actual_pessoas": 30,
     "coords": {
       "lat": -8.791025170833947,
       "lng": 13.330115750918964
