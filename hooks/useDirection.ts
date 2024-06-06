@@ -15,8 +15,10 @@ export async function getRoute(
   );
 
   const json = await query.json();
+  // console.log(json);
 
   const data = json.routes[0];
+
   const route = data.geometry.coordinates;
   const geojson = {
     type: "Feature",
@@ -50,6 +52,8 @@ export async function getRoute(
       },
     });
   }
+
+  return data;
   // add turn instructions here at the end
 }
 

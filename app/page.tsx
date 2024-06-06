@@ -19,6 +19,7 @@ import { getRoute, useDirection } from "@/hooks/useDirection";
 import { useSetRefreshPoitMarker } from "@/hooks/useSetRefreshPointMarker";
 import { useGetRefreshPoint } from "@/hooks/useGetRefreshPoint";
 import { cn } from "@/lib/utils";
+import PontoRefrescamento from "@/@types/PontoRefrescamento";
 
 const token =
   "pk.eyJ1Ijoic2t5LTIwMjQiLCJhIjoiY2x3eG5lcmZpMWNpNzJucjFoN2dwYnFiMSJ9.4IEOvqX3dGRZpyHPx-MD9g";
@@ -29,6 +30,7 @@ export default function Home() {
   const { map } = useMap("map");
   const { setTracking, tracking } = useDirection(token, map);
   useSetRefreshPoitMarker(map);
+  const [data, setData] = useState<any>();
 
   useMyPosition(map, (lng, lat) => {
     setTracking((prev) => ({ ...prev, start: [lng, lat] }));
@@ -37,6 +39,7 @@ export default function Home() {
   const [refreshCoords, setRefreshCoords] = useState([0, 0]);
 
   const { pontos, setPointSelected } = useGetRefreshPoint();
+  const [refrescamento, setPonto] = useState<PontoRefrescamento>();
 
   // useEffect(() => {
   //   if (map) {
@@ -380,11 +383,15 @@ export default function Home() {
                         </div>
                       </div>
                       <button
-                        disabled={ponto.estado !== "FUNCIONAL"}
+                        disabled={
+                          ponto.estado !== "FUNCIONAL" ||
+                          ponto.id === refrescamento?.id
+                        }
                         onClick={() => {
                           const { start } = tracking;
 
                           if (map && start) {
+                            setPonto(ponto);
                             setRefreshCoords([
                               ponto.coords.lng,
                               ponto.coords.lat,
@@ -439,7 +446,7 @@ export default function Home() {
                             getRoute(map, start, [
                               ponto.coords.lng,
                               ponto.coords.lat,
-                            ]);
+                            ]).then(setData);
                           }
                           //   && map.on("click", (event) => {
                           //   console.log("olad");
@@ -464,21 +471,38 @@ export default function Home() {
               <TabsContent value="tracking">
                 <ul className="space-y-2 text-sm">
                   <li className="">
-                    Distância: <span className="font-bold">2km</span>
+                    Distância:{" "}
+                    <span className="font-bold">
+                      {data?.distance && (data?.distance / 1000).toFixed(1)} km
+                    </span>
                   </li>
                   <li className="">
-                    Tempo: <span className="font-bold">12min</span>
+                    Tempo:{" "}
+                    <span className="font-bold">
+                      {data?.distance && (data?.duration / 60).toFixed(0)} min
+                    </span>
                   </li>
                   <li className="border-t pt-2">
                     <span className="mb-2 inline-block">Detalhe do ponto</span>
                     <ul className="pl-4 space-y-2">
                       <li>
-                        Pessoas: <span className="font-bold">3</span>
+                        Pessoas:{" "}
+                        <span className="font-bold">
+                          {refrescamento?.numero_actual_pessoas}
+                        </span>
                       </li>
                       <li>
                         Estado:{" "}
-                        <span className="font-bold text-green-600">
-                          Funcionando
+                        <span
+                          className={cn(
+                            "ml-2 text-sm text-green-600 font-bold",
+                            refrescamento?.estado === "CHEIO" &&
+                              "text-orange-600",
+                            refrescamento?.estado === "INDISPONÍVEL" &&
+                              "text-red-600"
+                          )}
+                        >
+                          {refrescamento?.estado}
                         </span>
                       </li>
                     </ul>
