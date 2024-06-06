@@ -52,6 +52,7 @@ export async function getRoute(
       },
     });
   }
+  console.log(data);
 
   return data;
   // add turn instructions here at the end

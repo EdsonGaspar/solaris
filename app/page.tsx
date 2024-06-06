@@ -300,7 +300,8 @@ export default function Home() {
                 disabled
                 className="w-full bg-transparent border-b p-2 pb-0 pl-0 outline-none"
                 placeholder="Localização refrescamento"
-                value={refreshCoords.join(",")}
+                // value={refreshCoords.join(",")}
+                value={data?.legs[0].summary}
               />
             </div>
           </div>
@@ -473,13 +474,17 @@ export default function Home() {
                   <li className="">
                     Distância:{" "}
                     <span className="font-bold">
-                      {data?.distance && (data?.distance / 1000).toFixed(1)} km
+                      {(data?.distance && (data?.distance / 1000).toFixed(1)) ||
+                        0}{" "}
+                      km
                     </span>
                   </li>
                   <li className="">
                     Tempo:{" "}
                     <span className="font-bold">
-                      {data?.distance && (data?.duration / 60).toFixed(0)} min
+                      {(data?.distance && (data?.duration / 60).toFixed(0)) ||
+                        0}{" "}
+                      min
                     </span>
                   </li>
                   <li className="border-t pt-2">
