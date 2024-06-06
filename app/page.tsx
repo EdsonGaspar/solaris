@@ -470,49 +470,54 @@ export default function Home() {
               </TabsContent>
               {/* rastremento de ponto */}
               <TabsContent value="tracking">
-                <ul className="space-y-2 text-sm">
-                  <li className="">
-                    Distância:{" "}
-                    <span className="font-bold">
-                      {(data?.distance && (data?.distance / 1000).toFixed(1)) ||
-                        0}{" "}
-                      km
-                    </span>
-                  </li>
-                  <li className="">
-                    Tempo:{" "}
-                    <span className="font-bold">
-                      {(data?.distance && (data?.duration / 60).toFixed(0)) ||
-                        0}{" "}
-                      min
-                    </span>
-                  </li>
-                  <li className="border-t pt-2">
-                    <span className="mb-2 inline-block">Detalhe do ponto</span>
-                    <ul className="pl-4 space-y-2">
-                      <li>
-                        Pessoas:{" "}
-                        <span className="font-bold">
-                          {refrescamento?.numero_actual_pessoas}
-                        </span>
-                      </li>
-                      <li>
-                        Estado:{" "}
-                        <span
-                          className={cn(
-                            "ml-2 text-sm text-green-600 font-bold",
-                            refrescamento?.estado === "CHEIO" &&
-                              "text-orange-600",
-                            refrescamento?.estado === "INDISPONÍVEL" &&
-                              "text-red-600"
-                          )}
-                        >
-                          {refrescamento?.estado}
-                        </span>
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
+                {refrescamento && (
+                  <ul className="space-y-2 text-sm">
+                    <li className="">
+                      Distância:{" "}
+                      <span className="font-bold">
+                        {(data?.distance &&
+                          (data?.distance / 1000).toFixed(1)) ||
+                          0}{" "}
+                        km
+                      </span>
+                    </li>
+                    <li className="">
+                      Tempo:{" "}
+                      <span className="font-bold">
+                        {(data?.distance && (data?.duration / 60).toFixed(0)) ||
+                          0}{" "}
+                        min
+                      </span>
+                    </li>
+                    <li className="border-t pt-2">
+                      <span className="mb-2 inline-block">
+                        Detalhe do ponto
+                      </span>
+                      <ul className="pl-4 space-y-2">
+                        <li>
+                          Pessoas:{" "}
+                          <span className="font-bold">
+                            {refrescamento?.numero_actual_pessoas}
+                          </span>
+                        </li>
+                        <li>
+                          Estado:{" "}
+                          <span
+                            className={cn(
+                              "ml-2 text-sm text-green-600 font-bold",
+                              refrescamento?.estado === "CHEIO" &&
+                                "text-orange-600",
+                              refrescamento?.estado === "INDISPONÍVEL" &&
+                                "text-red-600"
+                            )}
+                          >
+                            {refrescamento?.estado}
+                          </span>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                )}
               </TabsContent>
             </Tabs>
 
