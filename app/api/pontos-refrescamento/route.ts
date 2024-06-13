@@ -5,6 +5,7 @@ import { getAllPontos } from "@/lib/getAllPontos";
 
 async function GET() {
   const result = await getAllPontos();
+
   if (result.sucesso) {
     return NextResponse.json(result.pontos, { status: 200 });
   }

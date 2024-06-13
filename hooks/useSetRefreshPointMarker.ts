@@ -14,7 +14,17 @@ function useSetRefreshPoitMarker(map: mapboxgl.Map | null) {
       const res = await fetch("/api/pontos-refrescamento/");
 
       if (res.ok) {
-        const pontos: PontoRefrescamento[] = await res.json();
+        const datas = await res.json();
+        const pontos: PontoRefrescamento[] = datas.map((data) => {
+          return {
+            ...data,
+            coords: {
+              lat: Number(data.coords.split(";")[1]),
+              lng: Number(data.coords.split(";")[0]),
+            },
+            numero_actual_pessoas: 3,
+          };
+        });
 
         pontos.forEach((ponto) => {
           new mapboxgl.Marker()
